@@ -1,0 +1,14 @@
+Package: kRnk
+Type: Package
+Title: Tools for Health Insurance
+Version: 0.1.0
+Authors@R: 
+    person("Jan", "Vanhove", , "janvanhove@gmail.com", role = c("aut", "cre"))
+Description: Helper functions for working with healthcare actuarial data.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Imports: 
+    dplyr,
+    tidyr
