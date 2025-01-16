@@ -65,3 +65,8 @@ eintrittsalterspraemie <- function(x, i, pj, Kj) {
 #'
 #' @return Deckungskapital nach `m` Jahren.
 #' @export
+deckungskapital <- function(x, m, lx, i, pj, Kj) {
+  lxm <- (lx * cumprod(c(1, pj[(x + 1):length(pj)])))[m + 1]
+  leistungsbarwert(x + m, lxm, i, pj, Kj) -
+    eintrittsalterspraemie(x, i, pj, Kj) * rentenbarwert(x + m, lxm, i, pj)
+}
