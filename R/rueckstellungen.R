@@ -365,3 +365,20 @@ zsf <- function(S, alpha = NA, gamma = NA, pis) {
     dplyr::mutate(Rückstellungsbedarf = as.numeric(Rückstellungsbedarf)) |>
     dplyr::mutate_at(dplyr::vars(tidyselect::starts_with("Abrechnung")), as.numeric)
 }
+
+#' Abgerechnet im Ist-Jahr
+#'
+#' Schätzt die Proportion der Kosten, die im Ist-Jahr abgerechnet werden.
+#' Diese Proportion wird anhand des additiven Verfahrens geschätzt.
+#'
+#' @param S S-Matrix.
+#' @param pis Volumenmass.
+#'
+#' @return Proportion der Kosten, die im Ist-Jahr abgerechnet werden dürften.
+#' @export
+im_ist_jahr <- function(S, pis) {
+  X <- S |> to_X()
+  sigma_ad <- colSums(X, na.rm = TRUE) / rev(cumsum(pis))
+  gamma_ad <- cumsum(sigma_ad) / sum(sigma_ad)
+  gamma_ad[1]
+}
