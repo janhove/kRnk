@@ -325,7 +325,6 @@ cape_cod <- function(S, gamma, pis) {
 #' @param pis Volumenmass.
 #'
 #' @return Tibble mit anhand unterschiedlicher Algorithmen geschätztem Rückstellungsbedarf.
-
 zsf <- function(S, alpha = NA, gamma = NA, pis) {
   if (is.na(gamma)) {
     phi_cl <- phi(S)
