@@ -358,23 +358,10 @@ zsf <- function(S, alpha = NA, gamma = NA, pis) {
       S |> loss_dev(gamma) |> rueckstellung(),
       S |> loss_dev(gamma) |> to_X() |> shift_right() |> colSums(na.rm = TRUE) |> t())
   )
-  # tibble::tibble(
-  #   Methode = "Chain ladder",
-  #   Rückstellungsbedarf = S |>
-  #     chain_ladder() |>
-  #     rueckstellung()) |>
-  #   tibble::add_row(Methode = "Additives Verfahren (bf)",
-  #           Rückstellungsbedarf = S |> additiv(pis = pis) |> rueckstellung()) |>
-  #   tibble::add_row(Methode = "Panning (bf)",
-  #           Rückstellungsbedarf = S |> panning() |> rueckstellung()) |>
-  #   tibble::add_row(Methode = "Bornhuetter-Ferguson",
-  #           Rückstellungsbedarf = S |> bf(gamma, alpha) |> rueckstellung()) |>
-  #   tibble::add_row(Methode = "Cape Cod",
-  #           Rückstellungsbedarf = S |> cape_cod(gamma, pis) |> rueckstellung()) |>
-  #   tibble::add_row(Methode = "Mack",
-  #           Rückstellungsbedarf = S |> mack(pis) |> rueckstellung()) |>
-  #   tibble::add_row(Methode = "Loss-development",
-  #           Rückstellungsbedarf = S |> loss_dev(gamma) |> rueckstellung())
-  colnames(my_zsf) <- c("Methode", "Rückstellungsbedarf", paste0("Abrechnung", rownames(S)))
-  my_zsf
+  my_zsf <- data.frame(my_zsf)
+  colnames(my_zsf) <- c("Methode", "Rückstellungsbedarf",
+                        paste0("Abrechnung", S |> to_X() |> shift_right() |> colnames()))
+  tibble::tibble(my_zsf) |>
+    dplyr::mutate(Rückstellungsbedarf = as.numeric(Rückstellungsbedarf)) |>
+    dplyr::mutate_at(dplyr::vars(tidyselect::starts_with("Abrechnung")), as.numeric)
 }
