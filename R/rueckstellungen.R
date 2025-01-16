@@ -312,7 +312,8 @@ cape_cod <- function(S, gamma, pis) {
 
 #' Rückstellungszusammenfassung
 #'
-#' Unterschiedliche Algorithmen auf S-Matrix anwenden.
+#' Wendet unterschiedliche Algorithmen auf S-Matrix an und berechnet
+#' aus diesen Rückstellungsbedarf.
 #' Wenn `alpha`, `gamma` nicht mitgeliefert werden, werden diese anhand
 #' des Chain-Ladders geschätzt. Falls `loss_dev()` mit Chain-Ladder-gamma-Schätzungen
 #' verwendet wird, ergibt dies die Chain-Ladder-Rückstellungsschätzung.
@@ -334,21 +335,46 @@ zsf <- function(S, alpha = NA, gamma = NA, pis) {
   if (is.na(alpha)) {
     alpha <- apply(S |> chain_ladder(), 1, max)
   }
-  tibble::tibble(
-    Methode = "Chain ladder",
-    Rückstellungsbedarf = S |>
-      chain_ladder() |>
-      rueckstellung()) |>
-    tibble::add_row(Methode = "Additives Verfahren (bf)",
-            Rückstellungsbedarf = S |> additiv(pis = pis) |> rueckstellung()) |>
-    tibble::add_row(Methode = "Panning (bf)",
-            Rückstellungsbedarf = S |> panning() |> rueckstellung()) |>
-    tibble::add_row(Methode = "Bornhuetter-Ferguson",
-            Rückstellungsbedarf = S |> bf(gamma, alpha) |> rueckstellung()) |>
-    tibble::add_row(Methode = "Cape Cod",
-            Rückstellungsbedarf = S |> cape_cod(gamma, pis) |> rueckstellung()) |>
-    tibble::add_row(Methode = "Mack",
-            Rückstellungsbedarf = S |> mack(pis) |> rueckstellung()) |>
-    tibble::add_row(Methode = "Loss-development",
-            Rückstellungsbedarf = S |> loss_dev(gamma) |> rueckstellung())
+  my_zsf <- rbind(
+    c("Chain ladder",
+      S |> chain_ladder() |> rueckstellung(),
+      S |> chain_ladder() |> to_X() |> shift_right() |> colSums(na.rm = TRUE) |> t()),
+    c("Additives Verfahren (bf)",
+      S |> additiv(pis = pis) |> rueckstellung(),
+      S |> additiv(pis = pis) |> to_X() |> shift_right() |> colSums(na.rm = TRUE) |> t()),
+    c("Panning (bf)",
+      S |> panning() |> rueckstellung(),
+      S |> panning() |> to_X() |> shift_right() |> colSums(na.rm = TRUE) |> t()),
+    c("Bornhuetter-Ferguson",
+      S |> bf(gamma, alpha) |> rueckstellung(),
+      S |> bf(gamma, alpha) |> to_X() |> shift_right() |> colSums(na.rm = TRUE) |> t()),
+    c("Cape-Cod",
+      S |> cape_cod(gamma, pis) |> rueckstellung(),
+      S |> cape_cod(gamma, pis) |> to_X() |> shift_right() |> colSums(na.rm = TRUE) |> t()),
+    c("Mack",
+      S |> mack(pis) |> rueckstellung(),
+      S |> mack(pis) |> to_X() |> shift_right() |> colSums(na.rm = TRUE) |> t()),
+    c("Loss-development",
+      S |> loss_dev(gamma) |> rueckstellung(),
+      S |> loss_dev(gamma) |> to_X() |> shift_right() |> colSums(na.rm = TRUE) |> t())
+  )
+  # tibble::tibble(
+  #   Methode = "Chain ladder",
+  #   Rückstellungsbedarf = S |>
+  #     chain_ladder() |>
+  #     rueckstellung()) |>
+  #   tibble::add_row(Methode = "Additives Verfahren (bf)",
+  #           Rückstellungsbedarf = S |> additiv(pis = pis) |> rueckstellung()) |>
+  #   tibble::add_row(Methode = "Panning (bf)",
+  #           Rückstellungsbedarf = S |> panning() |> rueckstellung()) |>
+  #   tibble::add_row(Methode = "Bornhuetter-Ferguson",
+  #           Rückstellungsbedarf = S |> bf(gamma, alpha) |> rueckstellung()) |>
+  #   tibble::add_row(Methode = "Cape Cod",
+  #           Rückstellungsbedarf = S |> cape_cod(gamma, pis) |> rueckstellung()) |>
+  #   tibble::add_row(Methode = "Mack",
+  #           Rückstellungsbedarf = S |> mack(pis) |> rueckstellung()) |>
+  #   tibble::add_row(Methode = "Loss-development",
+  #           Rückstellungsbedarf = S |> loss_dev(gamma) |> rueckstellung())
+  colnames(my_zsf) <- c("Methode", "Rückstellungsbedarf", paste0("Abrechnung", rownames(S)))
+  my_zsf
 }

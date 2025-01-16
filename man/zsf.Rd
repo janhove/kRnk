@@ -19,7 +19,8 @@ zsf(S, alpha = NA, gamma = NA, pis)
 Tibble mit anhand unterschiedlicher Algorithmen geschätztem Rückstellungsbedarf.
 }
 \description{
-Unterschiedliche Algorithmen auf S-Matrix anwenden.
+Wendet unterschiedliche Algorithmen auf S-Matrix an und berechnet
+aus diesen Rückstellungsbedarf.
 Wenn \code{alpha}, \code{gamma} nicht mitgeliefert werden, werden diese anhand
 des Chain-Ladders geschätzt. Falls \code{loss_dev()} mit Chain-Ladder-gamma-Schätzungen
 verwendet wird, ergibt dies die Chain-Ladder-Rückstellungsschätzung.
