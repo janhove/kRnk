@@ -12,6 +12,7 @@ k <- function(s, f, sb, m) { # Formel 31, S. 184
   if (f <= s && s < f + m / sb) return(f + (s-f)*sb)
   f + m
 }
+k <- Vectorize(k)
 
 #' Kostenbeteiligung anhand von Kostenklassen berechnen.
 #'
